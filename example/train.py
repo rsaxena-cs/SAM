@@ -37,8 +37,9 @@ if __name__ == "__main__":
     model = WideResNet(args.depth, args.width_factor, args.dropout, in_channels=3, labels=10).to(device)
 
     base_optimizer = torch.optim.SGD
-    optimizer = SAM(model.parameters(), base_optimizer, rho=args.rho, adaptive=args.adaptive, lr=args.learning_rate, momentum=args.momentum, weight_decay=args.weight_decay)
-    scheduler = StepLR(optimizer, args.learning_rate, args.epochs)
+    # optimizer = SAM(model.parameters(), base_optimizer, rho=args.rho, adaptive=args.adaptive, lr=args.learning_rate, momentum=args.momentum, weight_decay=args.weight_decay)
+    # scheduler = StepLR(optimizer, args.learning_rate, args.epochs)
+    scheduler = StepLR(base_optimizer, args.learning_rate, args.epochs)
 
     for epoch in range(args.epochs):
         model.train()
