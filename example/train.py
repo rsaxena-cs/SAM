@@ -83,7 +83,7 @@ if __name__ == "__main__":
                 log(model, loss.cpu(), correct.cpu())
 
     log.flush()
-    log.train_loss_arr.dump("{}/train_loss.pkl".format(args.trajectory_dir))
-    log.train_acc_arr.dump("{}/train_acc.pkl".format(args.trajectory_dir))
-    log.test_loss_arr.dump("{}/test_loss.pkl".format(args.trajectory_dir))
-    log.test_acc_arr.dump("{}/test_acc.pkl".format(args.trajectory_dir))
+    np.array(log.train_loss_arr).dump("{}/train_loss.pkl".format(args.trajectory_dir))
+    np.array(log.train_acc_arr).dump("{}/train_acc.pkl".format(args.trajectory_dir))
+    np.array(log.test_loss_arr).dump("{}/test_loss.pkl".format(args.trajectory_dir))
+    np.array(log.test_acc_arr).dump("{}/test_acc.pkl".format(args.trajectory_dir))
