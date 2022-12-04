@@ -6,7 +6,7 @@ import random
 
 from utility.cutout import Cutout
 
-def noisy_transform_img_help(prob=0.6):
+def noisy_transform_img_help(prob=0.8):
     def noisy_transform_img(img):
         p1 = random.uniform(0, 1)
         if p1 < prob:
