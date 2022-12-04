@@ -39,8 +39,8 @@ class Log:
         if self.is_train:
             loss = self.epoch_state["loss"] / self.epoch_state["steps"]
             accuracy = self.epoch_state["accuracy"] / self.epoch_state["steps"]
-            # self.train_loss_arr.append(loss)
-            # self.train_acc_arr.append(accuracy)
+            self.train_loss_arr.append(loss)
+            self.train_acc_arr.append(accuracy)
 
             print(
                 f"\r┃{self.epoch:12d}  ┃{loss:12.4f}  │{100*accuracy:10.2f} %  ┃{self.learning_rate:12.3e}  │{self._time():>12}  ┃",
@@ -72,8 +72,8 @@ class Log:
         if self.step % self.log_each == self.log_each - 1:
             loss = self.last_steps_state["loss"] / self.last_steps_state["steps"]
             accuracy = self.last_steps_state["accuracy"] / self.last_steps_state["steps"]
-            self.train_loss_arr.append(loss)
-            self.train_acc_arr.append(accuracy)
+            # self.train_loss_arr.append(loss)
+            # self.train_acc_arr.append(accuracy)
 
             self.last_steps_state = {"loss": 0.0, "accuracy": 0.0, "steps": 0}
             progress = self.step / self.len_dataset
