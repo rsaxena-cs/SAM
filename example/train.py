@@ -46,6 +46,7 @@ if __name__ == "__main__":
         log.train(len_dataset=len(dataset.train))
 
         for batch in dataset.train:
+            base_optimizer.zero_grad()
             inputs, targets = (b.to(device) for b in batch)
 
             # first forward-backward step
@@ -53,12 +54,13 @@ if __name__ == "__main__":
             predictions = model(inputs)
             loss = smooth_crossentropy(predictions, targets, smoothing=args.label_smoothing)
             loss.mean().backward()
-            optimizer.first_step(zero_grad=True)
+            base_optimizer.step()
+            # optimizer.first_step(zero_grad=True)
 
-            # second forward-backward step
-            disable_running_stats(model)
-            smooth_crossentropy(model(inputs), targets, smoothing=args.label_smoothing).mean().backward()
-            optimizer.second_step(zero_grad=True)
+            # # second forward-backward step
+            # disable_running_stats(model)
+            # smooth_crossentropy(model(inputs), targets, smoothing=args.label_smoothing).mean().backward()
+            # optimizer.second_step(zero_grad=True)
 
             with torch.no_grad():
                 correct = torch.argmax(predictions.data, 1) == targets
