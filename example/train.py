@@ -8,6 +8,7 @@ from utility.log import Log
 from utility.initialize import initialize
 from utility.step_lr import StepLR
 from utility.bypass_bn import enable_running_stats, disable_running_stats
+import numpy as np
 
 import sys; sys.path.append("..")
 from sam import SAM
@@ -27,6 +28,7 @@ if __name__ == "__main__":
     parser.add_argument("--rho", default=2.0, type=int, help="Rho parameter for SAM.")
     parser.add_argument("--weight_decay", default=0.0005, type=float, help="L2 weight decay.")
     parser.add_argument("--width_factor", default=8, type=int, help="How many times wider compared to normal ResNet.")
+    parser.add_argument("--trajectory_dir", default=8, type=int, help="Directory with the trajectories.")
     args = parser.parse_args()
 
     initialize(args, seed=42)
@@ -81,3 +83,7 @@ if __name__ == "__main__":
                 log(model, loss.cpu(), correct.cpu())
 
     log.flush()
+    log.train_loss_arr.dump("{}/train_loss.pkl".format(args.trajectory_dir))
+    log.train_acc_arr.dump("{}/train_acc.pkl".format(args.trajectory_dir))
+    log.test_loss_arr.dump("{}/test_loss.pkl".format(args.trajectory_dir))
+    log.test_acc_arr.dump("{}/test_acc.pkl".format(args.trajectory_dir))
