@@ -38,18 +38,19 @@ if __name__ == "__main__":
     log = Log(log_each=10)
     model = WideResNet(args.depth, args.width_factor, args.dropout, in_channels=3, labels=10).to(device)
 
-    # base_optimizer = torch.optim.SGD
-    base_optimizer = torch.optim.SGD(model.parameters(), lr=args.learning_rate, momentum=args.momentum, weight_decay=args.weight_decay)
-    # optimizer = SAM(model.parameters(), base_optimizer, rho=args.rho, adaptive=args.adaptive, lr=args.learning_rate, momentum=args.momentum, weight_decay=args.weight_decay)
-    # scheduler = StepLR(optimizer, args.learning_rate, args.epochs)
-    scheduler = StepLR(base_optimizer, args.learning_rate, args.epochs)
+    # base_optimizer = torch.optim.SGD(model.parameters(), lr=args.learning_rate, momentum=args.momentum, weight_decay=args.weight_decay)
+    # scheduler = StepLR(base_optimizer, args.learning_rate, args.epochs)
+    base_optimizer = torch.optim.SGD
+    optimizer = SAM(model.parameters(), base_optimizer, rho=args.rho, adaptive=args.adaptive, lr=args.learning_rate, momentum=args.momentum, weight_decay=args.weight_decay)
+    scheduler = StepLR(optimizer, args.learning_rate, args.epochs)
+    
 
     for epoch in range(args.epochs):
         model.train()
         log.train(len_dataset=len(dataset.train))
 
         for batch in dataset.train:
-            base_optimizer.zero_grad()
+            # base_optimizer.zero_grad()
             inputs, targets = (b.to(device) for b in batch)
 
             # first forward-backward step
@@ -57,13 +58,13 @@ if __name__ == "__main__":
             predictions = model(inputs)
             loss = smooth_crossentropy(predictions, targets, smoothing=args.label_smoothing)
             loss.mean().backward()
-            base_optimizer.step()
-            # optimizer.first_step(zero_grad=True)
+            # base_optimizer.step()
+            optimizer.first_step(zero_grad=True)
 
             # # second forward-backward step
-            # disable_running_stats(model)
-            # smooth_crossentropy(model(inputs), targets, smoothing=args.label_smoothing).mean().backward()
-            # optimizer.second_step(zero_grad=True)
+            disable_running_stats(model)
+            smooth_crossentropy(model(inputs), targets, smoothing=args.label_smoothing).mean().backward()
+            optimizer.second_step(zero_grad=True)
 
             with torch.no_grad():
                 correct = torch.argmax(predictions.data, 1) == targets
