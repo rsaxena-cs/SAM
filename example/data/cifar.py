@@ -2,11 +2,32 @@ import torch
 import torchvision
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
+import random
 
 from utility.cutout import Cutout
 
+def noisy_transform_img_help(prob=0.4):
+    def noisy_transform_img(img):
+        p1 = random.uniform(0, 1)
+        if p1 < prob:
+            p2 = random.uniform(0, 1)
+            if p2 < 1/3:
+                return transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.2)(img)
+            elif p2 < 2/3:
+                return transforms.GaussianBlur(kernel_size=15, sigma=(1., 2.))(img)
+            else:
+                # mask =  torch.rand(image.shape, device=torch.device("cuda")) < frequency
+                mask =  torch.rand(img.shape) < 0.05
+                # new_vals = (torch.rand(image.shape, device=torch.device("cuda")) < 0.5).float()
+                new_vals = (torch.rand(img.shape) < 0.5).float()
+                img[mask] = new_vals[mask]
+                return img
+        else:
+            return img
+    return noisy_transform_img
 
 class Cifar:
+
     def __init__(self, batch_size, threads):
         mean, std = self._get_statistics()
 
@@ -20,6 +41,7 @@ class Cifar:
 
         test_transform = transforms.Compose([
             transforms.ToTensor(),
+            noisy_transform_img_help(),
             transforms.Normalize(mean, std)
         ])
 
